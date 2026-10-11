@@ -1,0 +1,26 @@
+{
+  "name": "Mis Hábitos",
+  "short_name": "Hábitos",
+  "description": "Seguimiento de hábitos diarios con rachas. Proyecto de Contexto de Software de Daniel Salomón Palles Atis.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f0fdf4",
+  "theme_color": "#16a34a",
+  "icons": [
+    {
+      "src": "iconos/icono-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "iconos/icono-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
