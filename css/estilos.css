@@ -1,0 +1,333 @@
+/* ============================================================
+   estilos.css — Mis Hábitos (diseño "mobile first": primero celular)
+   ============================================================ */
+
+:root {
+  --fondo: #f0fdf4;
+  --superficie: #ffffff;
+  --texto: #14532d;
+  --texto-suave: #4b7a5c;
+  --borde: #d1e7d8;
+  --primario: #16a34a;
+  --primario-oscuro: #15803d;
+  --peligro: #dc2626;
+  --radio: 18px;
+  --alto-formulario: 76px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fondo: #0b1410;
+    --superficie: #13221a;
+    --texto: #dcfce7;
+    --texto-suave: #86b89a;
+    --borde: #234032;
+    --primario: #22c55e;
+    --primario-oscuro: #16a34a;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--fondo);
+  color: var(--texto);
+  line-height: 1.45;
+  /* espacio para que el formulario fijo no tape el último hábito */
+  padding-bottom: calc(var(--alto-formulario) + env(safe-area-inset-bottom));
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Texto solo para lectores de pantalla (accesibilidad) */
+.solo-lectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------- Barra superior ---------- */
+.barra-superior {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: calc(1.25rem + env(safe-area-inset-top)) 16px 1rem;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.barra-superior h1 {
+  font-size: 1.6rem;
+  margin: 0;
+}
+
+.fecha-hoy {
+  margin: 0.15rem 0 0;
+  color: var(--texto-suave);
+}
+
+/* Solo la primera letra en mayúscula: "Sábado, 10 de octubre" */
+.fecha-hoy::first-letter {
+  text-transform: uppercase;
+}
+
+.boton-instalar {
+  font: inherit;
+  font-weight: 600;
+  border: 1px solid var(--primario);
+  color: var(--primario);
+  background: transparent;
+  border-radius: 999px;
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+}
+
+/* ---------- Contenido ---------- */
+.contenido {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.progreso {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.texto-progreso {
+  margin: 0 0 0.6rem;
+  font-weight: 600;
+}
+
+.pista-progreso {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--fondo);
+  overflow: hidden;
+}
+
+.relleno-progreso {
+  height: 100%;
+  width: 0;
+  background: var(--primario);
+  border-radius: 999px;
+  transition: width 0.35s ease;
+}
+
+/* ---------- Lista de hábitos ---------- */
+.lista-habitos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.habito {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.9rem;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 0.9rem;
+  transition: border-color 0.2s;
+}
+
+.habito-hecho {
+  border-color: var(--primario);
+}
+
+.boton-marcar {
+  width: 3.2rem;
+  height: 3.2rem; /* objetivo táctil grande: mínimo recomendado ~44px */
+  border-radius: 50%;
+  border: 3px solid var(--primario);
+  background: transparent;
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.boton-marcar:active {
+  transform: scale(0.92);
+}
+
+.boton-marcar[aria-pressed="true"] {
+  background: var(--primario);
+}
+
+.habito-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.habito-nombre {
+  font-size: 1.05rem;
+  overflow-wrap: anywhere;
+}
+
+.habito-racha {
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+}
+
+.semana {
+  display: flex;
+  gap: 0.3rem;
+  margin-top: 0.25rem;
+}
+
+.dia {
+  width: 1.55rem;
+  height: 1.55rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: var(--fondo);
+  color: var(--texto-suave);
+}
+
+.dia-hecho {
+  background: var(--primario);
+  color: #fff;
+}
+
+.dia-hoy {
+  outline: 2px solid var(--primario);
+  outline-offset: 1px;
+}
+
+.boton-eliminar {
+  border: none;
+  background: transparent;
+  font-size: 1.15rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.boton-eliminar.boton-confirmar {
+  width: auto;
+  padding: 0 0.7rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--peligro);
+  opacity: 1;
+}
+
+.boton-eliminar:hover,
+.boton-eliminar:focus-visible {
+  opacity: 1;
+  background: var(--fondo);
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--texto);
+  outline-offset: 2px;
+}
+
+.mensaje-vacio {
+  text-align: center;
+  color: var(--texto-suave);
+  padding: 2rem 1rem;
+  margin: 0;
+}
+
+.pie {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--texto-suave);
+  padding: 2rem 0 1rem;
+}
+
+.pie p {
+  margin: 0.2rem 0;
+}
+
+/* ---------- Formulario fijo abajo ---------- */
+.formulario-habito {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--superficie);
+  border-top: 1px solid var(--borde);
+  padding: 0.6rem 16px calc(0.75rem + env(safe-area-inset-bottom));
+}
+
+.formulario-fila {
+  display: flex;
+  gap: 0.6rem;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.formulario-habito input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 1rem; /* 16px o más evita que iPhone haga zoom al escribir */
+  color: var(--texto);
+  background: var(--fondo);
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  padding: 0.75rem 1.1rem;
+}
+
+.boton-agregar {
+  width: 3rem;
+  height: 3rem;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--primario);
+  color: #fff;
+  font-size: 1.7rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.boton-agregar:hover {
+  background: var(--primario-oscuro);
+}
+
+.mensaje-error {
+  color: var(--peligro);
+  font-weight: 600;
+  font-size: 0.9rem;
+  max-width: 560px;
+  margin: 0 auto 0.4rem;
+}
+
+.mensaje-error:empty {
+  display: none;
+}
