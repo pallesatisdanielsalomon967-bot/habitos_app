@@ -1,63 +1,39 @@
-/*
- * sw.js — Service worker: un "ayudante" que el navegador ejecuta en segundo plano.
- * Guarda una copia de los archivos de la app (caché) para que abra sin internet.
- *
- * Estrategia "red primero": si hay internet, descarga la versión más nueva y
- * actualiza la copia; si no hay internet, usa la copia guardada.
- */
-const NOMBRE_CACHE = "habitos-v1";
-
-// Rutas relativas a la carpeta donde está este archivo
-const ARCHIVOS_APP = [
-  "./",
-  "index.html",
-  "css/estilos.css",
-  "js/logica.js",
-  "js/app.js",
-  "manifest.json",
-  "iconos/icono-192.png",
-  "iconos/icono-512.png"
+/* sw.js — Guarda la app en el celular para que abra sin internet. Subir la versión al cambiar archivos. */
+const VERSION = "viaticoya-v3";
+const ARCHIVOS = [
+  "./", "index.html", "manifest.webmanifest", "css/estilos.css",
+  "js/config.js", "js/logica.js", "js/xlsx.js", "js/almacen.js", "js/ui.js", "js/datos.js", "js/app.js",
+  "fonts/barlow-latin-400-normal.woff2", "fonts/barlow-latin-600-normal.woff2", "fonts/barlow-latin-700-normal.woff2",
+  "fonts/barlow-condensed-latin-600-normal.woff2", "fonts/barlow-condensed-latin-700-normal.woff2",
+  "iconos/icono-192.png", "iconos/icono-512.png", "iconos/icono-maskable-512.png", "iconos/apple-touch-icon.png"
 ];
 
-// 1. Instalación: guarda los archivos básicos
-self.addEventListener("install", (evento) => {
-  evento.waitUntil(
-    caches.open(NOMBRE_CACHE).then((cache) => cache.addAll(ARCHIVOS_APP))
-  );
-  self.skipWaiting(); // activa esta versión sin esperar
+self.addEventListener("install", (e) => {
+  e.waitUntil(caches.open(VERSION).then((c) => c.addAll(ARCHIVOS)).then(() => self.skipWaiting()));
 });
 
-// 2. Activación: borra cachés de versiones anteriores
-self.addEventListener("activate", (evento) => {
-  evento.waitUntil(
-    caches.keys().then((nombres) =>
-      Promise.all(nombres.filter((n) => n !== NOMBRE_CACHE).map((n) => caches.delete(n)))
-    )
-  );
-  self.clients.claim();
+self.addEventListener("activate", (e) => {
+  e.waitUntil(caches.keys().then((claves) => Promise.all(claves.filter((k) => k !== VERSION).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
 });
 
-// 3. Cada petición: red primero, caché si no hay internet
-self.addEventListener("fetch", (evento) => {
-  const peticion = evento.request;
-  // Solo manejamos lecturas (GET) de nuestro propio sitio
-  if (peticion.method !== "GET" || new URL(peticion.url).origin !== self.location.origin) return;
-
-  evento.respondWith(
-    fetch(peticion)
-      .then((respuesta) => {
-        if (respuesta.ok) {
-          const copia = respuesta.clone(); // una respuesta solo se puede leer una vez
-          caches.open(NOMBRE_CACHE).then((cache) => cache.put(peticion, copia));
-        }
-        return respuesta;
-      })
-      .catch(async () => {
-        const guardada = await caches.match(peticion);
-        if (guardada) return guardada;
-        // Si se pide la página sin internet y no está exacta, mostramos la principal
-        if (peticion.mode === "navigate") return caches.match("index.html");
-        return Response.error();
-      })
+// Archivos de la app: primero la copia guardada (rápido y sin internet), y se refresca en segundo plano.
+// Todo lo demás (servidor, fotos, datos) va directo a la red: nunca se guarda aquí.
+self.addEventListener("fetch", (e) => {
+  const req = e.request;
+  const url = new URL(req.url);
+  if (req.method !== "GET" || url.origin !== self.location.origin) return;
+  // La configuración se pide siempre primero a la red: así un cambio de claves se ve de inmediato (y sin internet usa la copia).
+  if (url.pathname.endsWith("/js/config.js")) {
+    e.respondWith(fetch(req).then((r) => { if (r.ok) { const copia = r.clone(); caches.open(VERSION).then((c) => c.put(req, copia)); } return r; }).catch(() => caches.match(req, { ignoreSearch: true })));
+    return;
+  }
+  e.respondWith(
+    caches.match(req, { ignoreSearch: true }).then((guardado) => {
+      const red = fetch(req).then((r) => {
+        if (r.ok) { const copia = r.clone(); caches.open(VERSION).then((c) => c.put(req, copia)); }
+        return r;
+      }).catch(() => guardado || (req.mode === "navigate" ? caches.match("index.html") : Response.error()));
+      return guardado || red;
+    })
   );
 });
